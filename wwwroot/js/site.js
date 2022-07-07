@@ -33,8 +33,10 @@ function run() {
                 var sFileData = oFREvent.target.result;
                 var sBase64Data = sFileData.substr(sFileData.indexOf(header) + header.length);
 
-                var oCertName = document.getElementById("CertName");
-                var sCertName = oCertName.value; // Здесь следует заполнить SubjectName сертификата
+                var oCertName = document.getElementById("CertNameSelect");
+               // console.dir(oCertName);
+
+                var sCertName = oCertName[oCertName.selectedIndex].outerText; // Здесь следует заполнить SubjectName сертификата
                 if ("" == sCertName) {
                     alert("Введите имя сертификата (CN).");
                     return;
@@ -74,6 +76,7 @@ function run() {
                 document.getElementById("signature").innerHTML = sSignedMessage;
 
                 var oSignedData2 = yield cadesplugin.CreateObjectAsync("CAdESCOM.CadesSignedData");
+
                 try {
                     yield oSignedData2.propset_ContentEncoding(CADESCOM_BASE64_TO_BINARY);
                     yield oSignedData2.propset_Content(sBase64Data);
@@ -113,14 +116,43 @@ function downloadSignature() {
     a.click();
 }
 
-window.onload = function () {
+function additionSelectOptions() {
+    cadesplugin.async_spawn(function* (args) {
+        var oStore = yield cadesplugin.CreateObjectAsync("CAdESCOM.Store");
+        yield oStore.Open(CAPICOM_CURRENT_USER_STORE, CAPICOM_MY_STORE,
+            CAPICOM_STORE_OPEN_MAXIMUM_ALLOWED);
+
+        var certsList = yield oStore.Certificates;
+        var certsCount = yield certsList.Count;
+
+        var regExp = /, CN=.*, E=/;
+        for (var i = 1; i <= certsCount; i++) {
+            try {
+                cert = yield certsList.Item(i);
+                var str = yield cert.SubjectName;
+                var resultString = str.match(regExp)[0];
+                resultString = resultString.slice(5, resultString.length - 4);
+                $('#CertNameSelect').prepend($('<option>' + resultString + '</option>'));
+            }
+            catch (ex) {
+                alert("Ошибка при перечислении сертификатов: " + cadesplugin.getLastError(ex));
+                return;
+            }
+        }
+    });
+}
+
+
+$(document).ready(function () {
     var inputArea = document.getElementById('uploadFile');
     inputArea.addEventListener('change', function () {
         var signatureResult = document.getElementById('signature');
-        console.dir(signatureResult);
         if (this.value) { // Если выбрали новый файл
             signatureResult.innerHTML = '';
-            console.log('func');
         }
     })
-};
+
+    cadesplugin.then(() => { // Ожидание загрузки плагина
+        additionSelectOptions();
+    });
+})

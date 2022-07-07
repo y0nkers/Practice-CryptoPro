@@ -11,8 +11,10 @@
     <form action="javascript:void(0);">
         <label for="uploadFile" class="label">Загрузите файл для подписи</label>
         <input type="file" id="uploadFile" />
-        <label for="CertName" class="label">Введите имя сертификата:</label>
-        <input type="text" id="CertName">
+        <label for="CertNameSelect" class="label">Выберите сертификат:</label>
+        @*<input type="text" id="CertName">*@
+        <select id="CertNameSelect">
+        </select>
 
         @*<label for="hash">Хэш файла</label>
             <input type="text" id="hash">
