@@ -14,7 +14,7 @@ function run() {
             alert('The File APIs are not fully supported in this browser.');
         }
         if (0 === document.getElementById("uploadFile").files.length) {
-            alert("Select the file.");
+            alert("Не выбран файл для подписи!");
             return;
         }
         var oFile = document.getElementById("uploadFile").files[0];
@@ -48,7 +48,7 @@ function run() {
                     CAPICOM_CERTIFICATE_FIND_SUBJECT_NAME, sCertName);
                 var certsCount = yield oCertificates.Count;
                 if (certsCount === 0) {
-                    alert("Certificate not found: " + sCertName);
+                    alert("Сертификат не найден: " + sCertName);
                     return;
                 }
                 var oCertificate = yield oCertificates.Item(1);
@@ -63,7 +63,7 @@ function run() {
                 try {
                     var sSignedMessage = yield oSignedData.SignCades(oSigner, CADESCOM_CADES_BES, true);
                 } catch (err) {
-                    alert("Failed to create signature. Error: " + cadesplugin.getLastError(err));
+                    alert("Не удалось создать подпись. Ошибка: " + cadesplugin.getLastError(err));
                     return;
                 }
 
@@ -78,9 +78,9 @@ function run() {
                     yield oSignedData2.propset_ContentEncoding(CADESCOM_BASE64_TO_BINARY);
                     yield oSignedData2.propset_Content(sBase64Data);
                     yield oSignedData2.VerifyCades(sSignedMessage, CADESCOM_CADES_BES, true);
-                    alert("Signature verified");
+                    alert("Подпись подтверждена.");
                 } catch (err) {
-                    alert("Failed to verify signature. Error: " + cadesplugin.getLastError(err));
+                    alert("Не удалось подтвердить подпись. Ошибка: " + cadesplugin.getLastError(err));
                     return;
                 }
             });
@@ -89,13 +89,23 @@ function run() {
 }
 
 function downloadSignature() {
+    if (document.getElementById("uploadFile").files.length === 0) {
+        alert("Не выбран файл для подписи!");
+        return;
+    }
+
+    let signature = document.getElementById("signature").innerHTML;
+    if (signature == '') {
+        alert("Поле с подписью пусто!");
+        return;
+    }
+
     let signedFile = document.getElementById("uploadFile").files[0];
     const file = signedFile.name;
     const lastDot = file.lastIndexOf('.');
     const fileName = file.substring(0, lastDot);
     const fileExtension = file.substring(lastDot + 1);
 
-    let signature = document.getElementById("signature").innerHTML;
     let signatureFile = new Blob([signature], { type: 'text/html' });
     let a = document.createElement("a");
     a.href = URL.createObjectURL(signatureFile);
@@ -103,6 +113,14 @@ function downloadSignature() {
     a.click();
 }
 
-function updateSign() {
-    alert("Файл успешно подписан!");
-}
+window.onload = function () {
+    var inputArea = document.getElementById('uploadFile');
+    inputArea.addEventListener('change', function () {
+        var signatureResult = document.getElementById('signature');
+        console.dir(signatureResult);
+        if (this.value) { // Если выбрали новый файл
+            signatureResult.innerHTML = '';
+            console.log('func');
+        }
+    })
+};

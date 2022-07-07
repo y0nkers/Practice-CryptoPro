@@ -24,17 +24,4 @@
         <textarea id="signature" readonly></textarea>
         <button onclick="downloadSignature()">Скачать подпись</button>
     </form>
-
-    <script>
-        var inputArea = document.getElementById('uploadFile');
-        inputArea.addEventListener('change', function(){
-            var signatureResult = document.getElementById('signature');
-            console.dir(signatureResult);
-            if( this.value ){ // Если выбрали новый файл
-                signatureResult.innerHTML = '';
-                console.log('func');
-            }
-        });
-    </script>
-
 </div>
