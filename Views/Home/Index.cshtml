@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<div id="signForm">
+    <h3>Подписать документ</h3>
+    <form action="javascript:void(0);">
+        <label for="uploadFile" class="label">Загрузите файл для подписи</label>
+        <input type="file" id="uploadFile" />
+        <label for="CertName" class="label">Введите имя сертификата:</label>
+        <input type="text" id="CertName">
+
+        @*<label for="hash">Хэш файла</label>
+            <input type="text" id="hash">
+            <label for="signedHash">Подписанный хэш</label>
+            <input type="text" id="signedHash">*@
+        <button onclick="run()">Подписать файл</button>
+
+        <label for="signature" class="label">Подпись:</label>
+        <textarea id="signature" readonly></textarea>
+        <button onclick="downloadSignature()">Скачать подпись</button>
+    </form>
+</div>
