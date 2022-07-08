@@ -78,9 +78,10 @@ body {
 }
 
 #signature {
-    font-size: 9pt;
-    height: 600px;
-    width: 100%;
-    resize: none;
-    border: 0;
+    height: 400px;
+    width: 70%;
+}
+
+#hash {
+    width: 40%;
 }

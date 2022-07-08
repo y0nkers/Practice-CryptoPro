@@ -12,17 +12,28 @@
         <label for="uploadFile" class="label">Загрузите файл для подписи</label>
         <input type="file" id="uploadFile" />
         <label for="CertNameSelect" class="label">Выберите сертификат:</label>
-        @*<input type="text" id="CertName">*@
-        <select id="CertNameSelect">
+        <select id="CertNameSelect"></select>
+        <label for="" class="label">Выбрать алгоритм хэширования: </label>
+        <select id="HashAlgorithmSelect" onchange="setHashAlgorithm()">
+            <option value="100">ГОСТ Р 34.11-94</option>
+            <option value="110">ГОСТ Р 34.11-94 HMAC</option>
+            <option value="101">ГОСТ Р 34.11-2012 (256)</option>
+            <option value="111">ГОСТ Р 34.11-2012 (256) HMAC</option>
+            <option value="102">ГОСТ Р 34.11-2012 (512)</option>
+            <option value="112">ГОСТ Р 34.11-2012 (512) HMAC</option>
+            <option value="1">MD2</option>
+            <option value="2">MD4</option>
+            <option value="3">MD5</option>
+            <option value="4">SHA1 с длиной ключа 256 бит</option>
+            <option value="5">SHA1 с длиной ключа 384 бит</option>
+            <option value="6">SHA1 с длиной ключа 512 бит</option>
+            <option value="0">SHA1</option>
         </select>
-
-        @*<label for="hash">Хэш файла</label>
-        <input type="text" id="hash">
-        <label for="signedHash">Подписанный хэш</label>
-        <input type="text" id="signedHash">*@
-        <button onclick="run()">Подписать файл</button>
         <label for="hash" class="label">Хэш файла:</label>
         <textarea id="hash"></textarea>
+        <button onclick="getHash()">Получить хэш</button>
+        <div></div>
+        <button onclick="run()">Подписать файл</button>
         <label for="signature" class="label">Подпись:</label>
         <textarea id="signature" readonly></textarea>
         <button onclick="downloadSignature()">Скачать подпись</button>
