@@ -17,11 +17,12 @@
         </select>
 
         @*<label for="hash">Хэш файла</label>
-            <input type="text" id="hash">
-            <label for="signedHash">Подписанный хэш</label>
-            <input type="text" id="signedHash">*@
+        <input type="text" id="hash">
+        <label for="signedHash">Подписанный хэш</label>
+        <input type="text" id="signedHash">*@
         <button onclick="run()">Подписать файл</button>
-
+        <label for="hash" class="label">Хэш файла:</label>
+        <textarea id="hash"></textarea>
         <label for="signature" class="label">Подпись:</label>
         <textarea id="signature" readonly></textarea>
         <button onclick="downloadSignature()">Скачать подпись</button>

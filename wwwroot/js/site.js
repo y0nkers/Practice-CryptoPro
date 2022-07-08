@@ -33,6 +33,15 @@ function run() {
                 var sFileData = oFREvent.target.result;
                 var sBase64Data = sFileData.substr(sFileData.indexOf(header) + header.length);
 
+                var CADESCOM_HASH_ALGORITHM_CP_GOST_3411 = 100
+                // Создаем объект CAdESCOM.HashedData
+                var oHashedData = yield cadesplugin.CreateObjectAsync("CAdESCOM.HashedData");
+                oHashedData.propset_Algorithm(CADESCOM_HASH_ALGORITHM_CP_GOST_3411);
+                oHashedData.propset_DataEncoding(CADESCOM_BASE64_TO_BINARY);
+                yield oHashedData.Hash(sBase64Data);
+                var hashValue = yield oHashedData.Value;
+                document.getElementById("hash").innerHTML = hashValue;
+
                 var oCertName = document.getElementById("CertNameSelect");
                // console.dir(oCertName);
 
@@ -60,7 +69,8 @@ function run() {
 
                 var oSignedData = yield cadesplugin.CreateObjectAsync("CAdESCOM.CadesSignedData");
                 yield oSignedData.propset_ContentEncoding(CADESCOM_BASE64_TO_BINARY);
-                yield oSignedData.propset_Content(sBase64Data);
+                //yield oSignedData.propset_Content(sBase64Data);
+                yield oSignedData.propset_Content(hashValue);
 
                 try {
                     var sSignedMessage = yield oSignedData.SignCades(oSigner, CADESCOM_CADES_BES, true);
@@ -79,7 +89,7 @@ function run() {
 
                 try {
                     yield oSignedData2.propset_ContentEncoding(CADESCOM_BASE64_TO_BINARY);
-                    yield oSignedData2.propset_Content(sBase64Data);
+                    yield oSignedData2.propset_Content(hashValue);
                     yield oSignedData2.VerifyCades(sSignedMessage, CADESCOM_CADES_BES, true);
                     alert("Подпись подтверждена.");
                 } catch (err) {
@@ -125,13 +135,17 @@ function additionSelectOptions() {
         var certsList = yield oStore.Certificates;
         var certsCount = yield certsList.Count;
 
-        var regExp = /, CN=.*, E=/;
+        var regExp = /CN=.*/;
         for (var i = 1; i <= certsCount; i++) {
             try {
                 cert = yield certsList.Item(i);
                 var str = yield cert.SubjectName;
+                console.log("CERT NAME: " + str);
                 var resultString = str.match(regExp)[0];
-                resultString = resultString.slice(5, resultString.length - 4);
+                var firstcomma = resultString.indexOf(',');
+                if (firstcomma == -1) firstcomma = resultString.length - 1;
+                resultString = resultString.slice(3, firstcomma);
+                console.log("RESULT: " + resultString);
                 $('#CertNameSelect').prepend($('<option>' + resultString + '</option>'));
             }
             catch (ex) {
