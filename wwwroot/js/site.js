@@ -34,11 +34,10 @@ function run() {
                 var sFileData = oFREvent.target.result;
                 var sBase64Data = sFileData.substr(sFileData.indexOf(header) + header.length);
 
-                var CADESCOM_HASH_ALGORITHM_CP_GOST_3411 = 100
                 // Создаем объект CAdESCOM.HashedData
                 var oHashedData = yield cadesplugin.CreateObjectAsync("CAdESCOM.HashedData");
-                oHashedData.propset_Algorithm(CADESCOM_HASH_ALGORITHM);
-                oHashedData.propset_DataEncoding(CADESCOM_BASE64_TO_BINARY);
+                yield oHashedData.propset_Algorithm(CADESCOM_HASH_ALGORITHM);
+                yield oHashedData.propset_DataEncoding(CADESCOM_BASE64_TO_BINARY);
                 yield oHashedData.Hash(sBase64Data);
                 var hashValue = yield oHashedData.Value;
                 document.getElementById("hash").innerHTML = hashValue;
@@ -70,8 +69,8 @@ function run() {
 
                 var oSignedData = yield cadesplugin.CreateObjectAsync("CAdESCOM.CadesSignedData");
                 yield oSignedData.propset_ContentEncoding(CADESCOM_BASE64_TO_BINARY);
-                //yield oSignedData.propset_Content(sBase64Data);
-                yield oSignedData.propset_Content(hashValue);
+                yield oSignedData.propset_Content(sBase64Data);
+                //yield oSignedData.propset_Content(hashValue);
 
                 try {
                     var sSignedMessage = yield oSignedData.SignCades(oSigner, CADESCOM_CADES_BES, true);
@@ -90,7 +89,7 @@ function run() {
 
                 try {
                     yield oSignedData2.propset_ContentEncoding(CADESCOM_BASE64_TO_BINARY);
-                    yield oSignedData2.propset_Content(hashValue);
+                    yield oSignedData2.propset_Content(sBase64Data);
                     yield oSignedData2.VerifyCades(sSignedMessage, CADESCOM_CADES_BES, true);
                     alert("Подпись подтверждена.");
                 } catch (err) {
@@ -192,8 +191,8 @@ function getHash() {
 
                 // Создаем объект CAdESCOM.HashedData
                 var oHashedData = yield cadesplugin.CreateObjectAsync("CAdESCOM.HashedData");
-                oHashedData.propset_Algorithm(CADESCOM_HASH_ALGORITHM);
-                oHashedData.propset_DataEncoding(CADESCOM_BASE64_TO_BINARY);
+                yield oHashedData.propset_Algorithm(CADESCOM_HASH_ALGORITHM);
+                yield oHashedData.propset_DataEncoding(CADESCOM_BASE64_TO_BINARY);
                 yield oHashedData.Hash(sBase64Data);
                 var hashValue = yield oHashedData.Value;
                 document.getElementById("hash").innerHTML = hashValue;
@@ -203,15 +202,16 @@ function getHash() {
 }
 
 function setHashAlgorithm() {
-    CADESCOM_HASH_ALGORITHM = document.getElementById("HashAlgorithmSelect").value;
+    // https://cpdn.cryptopro.ru/content/cades/namespace_c_ad_e_s_c_o_m_c64bb9facc59333fe4815d569f2ca026_1c64bb9facc59333fe4815d569f2ca026.html
+    CADESCOM_HASH_ALGORITHM = parseInt(document.getElementById("HashAlgorithmSelect").value);
 }
 
 $(document).ready(function () {
     var inputArea = document.getElementById('uploadFile');
     inputArea.addEventListener('change', function () {
-        var signatureResult = document.getElementById('signature');
         if (this.value) { // Если выбрали новый файл
-            signatureResult.innerHTML = '';
+            document.getElementById('signature').innerHTML = '';
+            document.getElementById('hash').innerHTML = '';
         }
     })
 
